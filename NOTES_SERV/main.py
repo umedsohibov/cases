@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request #Flask это сервер, jsonify - чтоб json работали, request - читать запросы.
-#from storage import load_notes, save_notes
+#from storage import load_notes, save_notes ЭТО ОТНОСИТСЯ К json
 from sql_storage import init_db
 from sql_storage import get_all_notes_sql
 from sql_storage import create_note_sql
@@ -20,9 +20,9 @@ def get_json_data(): #выводим ошибки чтоб не дублиров
        return None, (jsonify({"error":"JSON is required"}), 400 )
     return data, None
 #def find_note_by_id(note_id):
-    for note in notes:
-        if note["id"] == note_id:
-            return note
+   # for note in notes:
+       # if note["id"] == note_id:
+           # return note
     return None
 
 @app.route("/notes", methods=["GET"]) #если придёт GET-запрос на /notes, выполнить
