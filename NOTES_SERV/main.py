@@ -18,6 +18,22 @@ from storage import (
 app = Flask(__name__)
 
 SQL_MODE = True
+if SQL_MODE:
+    storage = {
+        "get_all": get_all_notes_sql,
+        "create": create_note_sql,
+        "get_by_id": get_note_by_id_sql,
+        "update": update_note_sql,
+        "delete": delete_note_sql
+    }
+else:
+    storage = {
+        "get_all": get_all_notes_json,
+        "create": create_note_json,
+        "get_by_id": get_note_by_id_json,
+        "update": update_note_json,
+        "delete": delete_note_json
+    }
 
 def get_json_data():
     data = request.get_json()
@@ -27,10 +43,7 @@ def get_json_data():
 
 @app.route("/notes", methods=["GET"])
 def get_notes():
-    if SQL_MODE:
-        notes = get_all_notes_sql()
-    else:
-        notes = get_all_notes_json()
+    notes = storage["get_all"]()
     return jsonify(notes)
 
 @app.route("/notes", methods=["POST"])
@@ -42,18 +55,12 @@ def create_note():
     if not title:
         return jsonify({"error": "Title is required"}), 400
     content = data.get("content")
-    if SQL_MODE:
-        note = create_note_sql(title, content)
-    else:
-        note = create_note_json(title, content)
+    note = storage["create"](title, content)
     return jsonify(note), 201
 
 @app.route("/notes/<int:note_id>", methods=["GET"])
 def get_note(note_id):
-    if SQL_MODE:
-        note = get_note_by_id_sql(note_id)
-    else:
-        note = get_note_by_id_json(note_id)
+    note = storage["get_by_id"](note_id)
     if note:
         return jsonify(note)
     return jsonify({"error": "Note not found"}), 404
@@ -66,10 +73,7 @@ def update_note(note_id):
     title = data.get("title")
     content = data.get("content")
 
-    if SQL_MODE:
-        note = update_note_sql(note_id, title, content)
-    else:
-        note = update_note_json(note_id, title, content)
+    note = storage["update"](note_id, title, content)
 
     if not note:
         return jsonify({"error": "Note not found"}), 404
@@ -78,10 +82,7 @@ def update_note(note_id):
 
 @app.route("/notes/<int:note_id>", methods=["DELETE"])
 def delete_note(note_id):
-    if SQL_MODE:
-        deleted = delete_note_sql(note_id)
-    else:
-        deleted = delete_note_json(note_id)
+    deleted = storage["delete"](note_id)
     if not deleted:
         return jsonify({"error": "Note not found"}), 404
     return jsonify({"message": "Note deleted"})
