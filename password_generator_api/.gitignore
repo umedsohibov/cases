@@ -1,0 +1,10 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.DS_Store
+.idea/
+alembic/**/__pycache__/
+*.log
